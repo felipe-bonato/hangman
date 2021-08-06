@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta http-equiv="X-Content-Type-Options: text" content="IE=edge">
 	<title>Hangman! :: {{ title }}</title>
 </head>
 <body>
@@ -9,7 +10,7 @@
 		<a href="/play">Play</a>
 		<a href="/add">Add Words</a>
 	</nav>
-	{% block body %}{% endblock %}
-	{% block scripts %}{% endblock %}
+	{% block body %}{% endblock body %}
+	{% block scripts %}{% endblock scripts %}
 </body>
 </html>

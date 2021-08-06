@@ -14,7 +14,7 @@ nunjucks.configure('views', {
 
 app.set('views', './views');
 app.set('view engine', 'nunjucks');
-//app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
 	res.render('home/index', {
@@ -46,12 +46,17 @@ app.listen(4000, () => {
 /**
  * WEBSOCKET SERVER
  */
-/*
+
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({
 	port: 10000,
 }, () => console.log('Started websocket server'));
 
-wss.on('connection', (ws) => console.log('User connected on ws'));
-*/
+wss.on('connection', (ws) => {
+	console.log('User connected on ws')
+	ws.on('message', (msg) => {
+		console.log('Recievied: %s', msg);
+	});
+	ws.send('Server message');
+});
