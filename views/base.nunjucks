@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Hangman! :: {{ title }}</title>
+</head>
+<body>
+	<nav>
+		<a href="/">Home</a>
+		<a href="/play">Play</a>
+		<a href="/add">Add Words</a>
+	</nav>
+	{% block body %}{% endblock %}
+	{% block scripts %}{% endblock %}
+</body>
+</html>

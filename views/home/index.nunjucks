@@ -1,0 +1,8 @@
+{% extends "base.nunjucks" %}
+
+{% block body %}
+	<h1>Jogo da forca! (with inheritance)</h1>
+	{% for nome in nomes %}
+		<p>Olá {{ nome }}</p>
+	{% endfor %}
+{% endblock %}
