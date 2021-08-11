@@ -5,6 +5,7 @@
 	{% for nome in nomes %}
 		<p>Olá {{ nome }}</p>
 	{% endfor %}
+	<input type="number" id="play_with--input"></input><button id="play_with--button">Send</button>
 {% endblock body %}
 
 {% block scripts %}

@@ -19,27 +19,27 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', (req, res) => {
 	res.render('home/index', {
 		'title': 'Home',
-		'nomes': ['João', 'Felipe'],
+		'nomes': ['Felipe'],
 	});
-	console.log('User connected on http::home');
+	console.log('[INFO] User connected on http::home');
 });
 
 app.get('/play', (req, res) => {
 	res.render('play/index', {
 		'title': 'Play',
 	});
-	console.log('User connected on http::play');
+	console.log('[INFO] User connected on http::play');
 });
 
 app.get('/add', (req, res) => {
 	res.render('add/index', {
 		'title': 'Add',
 	});
-	console.log('User connected on http::add');
+	console.log('[INFO] User connected on http::add');
 });
 
 app.listen(4000, () => {
-	console.log('Started http server');
+	console.log('[SETUP] Started http server');
 });
 
 
@@ -52,13 +52,20 @@ app.listen(4000, () => {
 
 class ActiveUsers {
 	constructor(){
-		this.users = [];
+		this.users = {};
 		this.lastId = 0; // Id of the last user added
+	
+		this.status = {
+			IN_HOME: 'IN_HOME_STR',
+			PLAYING: 'PLAYING_STR',
+		}
 	}
 
 	insert() {
 		this.lastId++;
-		this.users.push(this.lastId);
+		this.users[this.lastId] = {
+			'status': this.status.IN_HOME,
+		};
 		return this.lastId;
 	}
 
@@ -66,8 +73,12 @@ class ActiveUsers {
 		return this.users;
 	}
 
+	get(id) {
+		return this.users[id];
+	}
+
 	remove(id) {
-		this.users.filter((value, index, arr) => value !== id)
+		delete this.users[id];
 	}
 }
 const users = new ActiveUsers();
@@ -76,10 +87,12 @@ const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({
 	port: 10000,
-}, () => console.log('Started websocket server'));
+}, () => console.log('[SETUP] Started websocket server'));
+
+
 
 wss.on('connection', ws => {
-	console.log('[INFO] User connected on ws');
+	console.log('[INFO] User connected on ws::home');
 
 	ws.send(JSON.stringify({
 		'type': 'setup',
@@ -91,20 +104,20 @@ wss.on('connection', ws => {
 		'users': users.getAll(),
 	}))
 	
-	ws.on('message', msg => {
-		data = JSON.parse(msg.data);
-		console.log('Recieved message: ' + data);
+	ws.onmessage = msg => {
+		const data = JSON.parse(msg.data);
 		switch (data.type) {
 			case 'disconnect':
-				console.log('[INFO] User ' + data.id + 'disconnected');
+				console.log('[INFO] User ' + data.id + ' disconnected');
 				users.remove(data.id);
 			break;
 			case 'play_with':
-				console.log('[INFO] Playing with ' + data.id);
+				console.log('[INFO] Playing with ' + data.player);
 			break;
 			default:
+				console.log('[ERROR] Could not parse message!')
 			break;
 		}
-	});
+	};
 });
 
