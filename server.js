@@ -43,9 +43,34 @@ app.listen(4000, () => {
 });
 
 
+
+
+
 /**
  * WEBSOCKET SERVER
  */
+
+class ActiveUsers {
+	constructor(){
+		this.users = [];
+		this.lastId = 0; // Id of the last user added
+	}
+
+	insert() {
+		this.lastId++;
+		this.users.push(this.lastId);
+		return this.lastId;
+	}
+
+	getAll() {
+		return this.users;
+	}
+
+	remove(id) {
+		this.users.filter((value, index, arr) => value !== id)
+	}
+}
+const users = new ActiveUsers();
 
 const WebSocket = require('ws');
 
@@ -53,10 +78,33 @@ const wss = new WebSocket.Server({
 	port: 10000,
 }, () => console.log('Started websocket server'));
 
-wss.on('connection', (ws) => {
-	console.log('User connected on ws')
-	ws.on('message', (msg) => {
-		console.log('Recievied: %s', msg);
+wss.on('connection', ws => {
+	console.log('[INFO] User connected on ws');
+
+	ws.send(JSON.stringify({
+		'type': 'setup',
+		'id': users.insert(),
+	}));
+
+	ws.send(JSON.stringify({
+		'type': 'active_users',
+		'users': users.getAll(),
+	}))
+	
+	ws.on('message', msg => {
+		data = JSON.parse(msg.data);
+		console.log('Recieved message: ' + data);
+		switch (data.type) {
+			case 'disconnect':
+				console.log('[INFO] User ' + data.id + 'disconnected');
+				users.remove(data.id);
+			break;
+			case 'play_with':
+				console.log('[INFO] Playing with ' + data.id);
+			break;
+			default:
+			break;
+		}
 	});
-	ws.send('Server message');
 });
+
