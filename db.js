@@ -4,30 +4,84 @@ const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://localhost:27017';
 const dbName = 'hangman';
 
-const client = new MongoClient(url);
-
-function insert_word(word, cb) {
+/**
+ * @param cb function(db_connection, errors)
+ */
+function getBbConnection(cb)
+{
+	const client = new MongoClient(url);
 	client.connect((err) => {
 		if(err){
-			cb(null, new Error('Could not connect to db\n[ERROR] Message: ' + err))
+			cb(null, new Error('Could not connect to db.\n' + err))
 		} else {
-			console.log('[INFO] Successfully coneect to db');
-			const db = client.db(dbName);
+			cb(client.db(dbName), null);
+		}
+		setTimeout(() => client.close(), 500); // <- Isso é uma estupidez
+	});
+}
 
-			get_all_words((data, err) => {
+/**
+ * 
+ * @param cb function(words, err)
+ */
+exports.getAllWords = function getAllWords(cb) {
+	getBbConnection((db, err) => {
+		if(err){
+			cb(null, err);
+		} else {
+			db.collection('words').find({}).toArray((err, docs) => {
 				if(err){
-					cb(null, '[ERROR] Could not get words from database');
-				} else if(data.includes(word)){
+					cb(null, new Error('Could not get words from database'));
+				} else {
+					cb(docs.map((word_pair) => word_pair.word), null);
+				}
+			});
+		}
+	});
+}
+
+/**
+ * @param cb function(word, err)
+ */
+exports.getRandomWord = function getRandomWord(cb) {
+	getBbConnection((db, err) => {
+		if(err){
+			cb(null, err);
+		} else {
+			db.collection('words').find({}).toArray((err, docs) => {
+				if(err){
+					cb(null, new Error('Could not get words from database'));
+				} else {
+					words = docs.map((word_pair) => word_pair.word)
+					cb(words[Math.floor(Math.random() * words.length)], null);
+				}
+			});
+		}
+	});
+}
+
+exports.insertWord = function insertWord(word, cb) {
+	word = word.toUpperCase();
+	getBbConnection((db, err) => {
+		if(err){
+			cb(null, err);
+		} else {
+			getAllWords((words, err) => {
+				if(err){
+					cb(null, new Error('Could not get words from database'));
+				} else if(words.includes(word)){
 					cb(null, new Error('Word already into database into database'));
 				} else {
 					db.collection('words').insertOne({
 						'word': word,
 					}, (err, r) => {
 						if(err){
-							cb(null, '[ERROR] Could not insert word into database');
+							cb(null, new Error('Could not insert word into database'));
 						} else if(r.insertedCount > 1){
-							cb(null, '[ERROR] Could not insert single word into database');
-						}			
+							cb(null, new Error('Could not insert single word into database'));
+						} else {
+							cb(r, null);
+						}		
 					});
 				}
 			});
@@ -35,71 +89,18 @@ function insert_word(word, cb) {
 	});
 }
 
-function get_all_words(cb) {
-	client.connect((err) => {
+function deleteAllWords(cb) {
+	getBbConnection((db, err) => {
 		if(err){
-			cb(null ,new Error('Could not connect to db\n[ERROR] ' + err));
-			return;
+			cb(null, err);
+		} else {
+			db.collection('words').deleteMany({}, (err, result) => {
+				if(err){
+					cb(null, new Error('Could not connect to DB.\n' + err));
+				} else {
+					cb(result, null);
+				}
+			});
 		}
-		console.log('[INFO] Successfully coneect to db');
-		const db = client.db(dbName);
-	
-		db.collection('words').find({}).toArray((err, docs) => {
-			if(err){
-				cb(null, '[ERROR] Could not get words from database');
-				return;
-			}
-			cb(docs.map((word_pair) => word_pair.word), null);
-		})
 	});
 }
-
-function get_random_word(cb) {
-	client.connect((err) => {
-		if(err){
-			cb(null, new Error('Could not connect to db\n[ERROR] Message: ' + err));
-			return;
-		}
-		console.log('[INFO] Successfully coneect to db');
-		const db = client.db(dbName);
-	
-		db.collection('words').find({}).toArray((err, docs) => {
-			if(err){
-				cb(null, '[ERROR] Could not insert word into database');
-				return;
-			}
-			console.log(docs)
-		})
-	});
-}
-
-function delete_all_words(cb) {
-	client.connect((err) => {
-		if(err){
-			cb(null, new Error('Could not connect to db\n[ERROR] Message: ' + err));
-			return;
-		}
-		console.log('[INFO] Successfully coneect to db');
-		const db = client.db(dbName);
-	
-		db.collection('words').deleteMany({}, (err, result) => {
-			if(err){
-				cb(null, '[ERROR] Could not connect to db\n[ERROR] Message: ' + err);
-				return;
-			}
-			console.log('[INFO] Successfully deleted ' + result.deletedCount + ' entries!');
-			cb(result, null);
-		});
-	});
-}
-
-
-insert_word('Cellphone', (data, err) => {
-	console.error(err)
-	console.log(data);
-});
-get_all_words((data, err) => {
-	err ? console.error(err) : console.log(data);
-});
-
-
