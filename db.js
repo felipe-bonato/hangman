@@ -1,48 +1,54 @@
-const MongoClient = require('mongodb').MongoClient;
 //mongod --dbpath=\data
+const MongoClient = require('mongodb').MongoClient;
+const fs = require('fs');
 
-const url = 'mongodb://localhost:27017';
-const dbName = 'hangman';
+const dbConfig = JSON.parse(fs.readFileSync('config/db.json'));
 
 exports.getAllWords = async function getAllWords() {
-	const client = new MongoClient(url);
+	let conn; // We need to create this variable here because variables are block scoped.
 	try {
-		const conn = await client.connect();
-		const words = await conn.db(dbName).collection('words').find({}).toArray();
-		return words.map((word_pair) => word_pair.word);
-	} catch {
-		throw new Error('Could not get words from database');
+		conn = await MongoClient.connect(dbConfig.url);
+		const entries = await conn.db(dbConfig.name).collection('words').find({}).toArray();
+		const words = entries.map(entry => entry.word);
+		return words;
+	} catch(e) {
+		throw new Error('Could not get word from database\n' + e.toString());
 	} finally {
-		client.close();
+		conn.close();
 	}
 }
 
 exports.getRandomWord = async function getRandomWord() {
-	const client = new MongoClient(url);
+	let conn; // We need to create this variable here because variables are block scoped.
 	try {
-		const conn = await client.connect();
-		const words = await conn.db(dbName).collection('words').find({}).toArray();
-		const words_arr = words.map((word_pair) => word_pair.word);
-		return words_arr[Math.floor(Math.random() * words_arr.length)];
-	} catch {
-		throw new Error('Could not get words from database');
+		conn = await MongoClient.connect(dbConfig.url);
+		const entries = await conn.db(dbConfig.name).collection('words').find({}).toArray();
+		const words = entries.map((entry) => entry.word);
+		return words[Math.floor(Math.random() * words.length)];
+	} catch(e) {
+		throw new Error('Could not get word from database\n' + e.toString());
 	} finally {
-		client.close();
+		conn.close();
 	}
 }
 
 exports.insertWord = async function insertWord(word) {
-	const client = new MongoClient(url);
-	const word = word.toUpperCase();
+	word = word.toUpperCase();
+	let conn; // We need to create this variable here because variables are block scoped.
 	try {
-		const conn = await client.connect();
-		const stored_words = await getAllWords();
-		if(stored_words.includes(word)) throw new Error('Word already exists');
+		conn = await MongoClient.connect(dbConfig.url);
+		
+		// Checks if already in db
+		const stored_words = await this.getAllWords();
+		if(stored_words.includes(word)) {
+			throw new Error('Word already exists');
+		}
+
 		conn.db(dbName).collection('words').insertOne({'word': word});
-	} catch {
-		throw new Error('Could not get words from database');
+	} catch(e) {
+		throw new Error('Could not get word from database\n' + e.toString());
 	} finally {
-		client.close();
+		conn.close();
 	}
 }
 
@@ -55,5 +61,18 @@ async function deleteAllWords() {
 		throw new Error('Could not get words from database');
 	} finally {
 		client.close();
+	}
+}
+
+async function deleteAllWords() {
+	let conn; // We need to create this variable here because variables are block scoped.
+	try {
+		conn = await MongoClient.connect(dbConfig.url);
+		// We don't need to await this one!
+		conn.db(dbName).collection('words').deleteMany({});
+	} catch(e) {
+		throw new Error('Could not get word from database\n' + e.toString());
+	} finally {
+		conn.close();
 	}
 }
