@@ -1,5 +1,9 @@
 'use strict';
 
+const db = require('./db');
+
+
+
 /**
  * HTTP SERVER
  */
@@ -15,6 +19,7 @@ nunjucks.configure('views', {
 app.set('views', './views');
 app.set('view engine', 'nunjucks');
 app.use(express.static(__dirname + '/public'));
+
 
 app.get('/', (req, res) => {
 	res.render('home/index', {
@@ -44,11 +49,11 @@ app.listen(4000, () => {
 
 
 
-
-
 /**
- * WEBSOCKET SERVER
+ * GAME LOGIC
  */
+
+
 
 class ActiveUsers {
 	constructor(){
@@ -83,17 +88,39 @@ class ActiveUsers {
 }
 const users = new ActiveUsers();
 
+class Game {
+	constructor() {
+		this.db = require('../db');
+	}
+
+	async fetchRandomWord() {
+		let rndWord = await this.db.getRandomWord();
+		this.word = rndWord.split('');
+		this.guessed = rndWord.split('').fill(null);
+
+	}
+
+	guess(letter) {
+		
+	}
+}
+const game = new Game();
+
+
+
+/**
+ * WEBSOCKET SERVER
+ */
+
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({
 	port: 10000,
 }, () => console.log('[SETUP] Started websocket server'));
 
-
-
 wss.on('connection', ws => {
-	console.log('[INFO] User connected on ws::home');
-
+	console.log('[INFO] User connected on ws');
+	
 	ws.send(JSON.stringify({
 		'type': 'setup',
 		'id': users.insert(),
@@ -112,7 +139,26 @@ wss.on('connection', ws => {
 				users.remove(data.id);
 			break;
 			case 'play_with':
-				console.log('[INFO] Playing with ' + data.player);
+				if (users.get(data.player) === undefined){
+					ws.send(JSON.stringify({
+						'type': 'error',
+						'subtype': 'player_do_not_exists',
+					}));
+					return;
+				}
+			
+				console.log('[INFO] Playing with: ' + data.player);
+
+				game.fetchRandomWord()
+					.then(() => {
+						
+					})
+					.catch(console.error);
+
+
+			break;
+			case 'add_word':
+				console.log('[INFO] Adding word: \"' + data.word + '\"');
 			break;
 			default:
 				console.log('[ERROR] Could not parse message!')
@@ -120,4 +166,6 @@ wss.on('connection', ws => {
 		}
 	};
 });
+
+
 

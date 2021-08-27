@@ -1,5 +1,20 @@
 {% extends "base.nunjucks" %}
 
+{% block styles %}
+	<link rel="stylesheet" href="home.css">
+{% endblock styles %}
+
+{% block flashErrors %}
+	<div id="flash-errors">
+		{% for error in errors %}
+			<div class="flash-error">
+				<h1>error.title</h1>
+				<p>error.description</p>
+			</div>
+		{% endfor %}
+	</div>
+{% endblock flashErrors %}
+
 {% block body %}
 	<h1>Jogo da forca!</h1>
 	{% for nome in nomes %}

@@ -1,0 +1,7 @@
+.flash-error {
+	color: red;
+}
+
+#flash-errors {
+	display: none
+}

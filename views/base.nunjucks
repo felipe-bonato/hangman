@@ -3,6 +3,7 @@
 <head>
 	<meta http-equiv="X-Content-Type-Options: text" content="IE=edge">
 	<title>Hangman! :: {{ title }}</title>
+	{% block styles %}{% endblock styles %}
 </head>
 <body>
 	<nav>
@@ -10,6 +11,7 @@
 		<a href="/play">Play</a>
 		<a href="/add">Add Words</a>
 	</nav>
+	{% block flashErrors %}{% endblock flashErrors %}
 	{% block body %}{% endblock body %}
 	{% block scripts %}{% endblock scripts %}
 </body>

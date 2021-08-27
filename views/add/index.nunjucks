@@ -1,18 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="/public/index.js"></script>
-	<title>Hangman</title>
-</head>
-<body>
-	<nav>
-		<a href="/">Home</a>
-		<a href="/play">Play</a>
-		<a href="/add">Add Words</a>
-	</nav>
-	<header><h1>Add!</h1></header>
-</body>
-</html>
+{% extends "base.nunjucks" %}
+
+{% block styles %}
+	<link rel="stylesheet" href="home.css">
+{% endblock styles %}
+
+{% block body %}
+	<h1>Words</h1>
+	<span id="add_word--error"></span>
+	<input type="text" id="add_word--input"></input><button id="add_word--button">Add</button>
+	{% for word in words %}
+		<p>{{ word }}</p>
+	{% endfor %}
+{% endblock body %}
+
+{% block scripts %}
+	<script src="add_words.js"></script>
+{% endblock scripts %}

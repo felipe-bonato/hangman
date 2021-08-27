@@ -1,0 +1,13 @@
+.container {
+	display: flex;
+	
+
+	width: 80%;
+	margin: auto;
+}
+
+#word-guess {
+    display: flex;
+    gap: 8px;
+}
+

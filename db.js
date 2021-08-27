@@ -2,7 +2,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const fs = require('fs');
 
-const dbConfig = JSON.parse(fs.readFileSync('config/db.json'));
+const dbConfig = JSON.parse(fs.readFileSync('/home/felipebonato/repos/hangman/config/db.json'));
 
 exports.getAllWords = async function getAllWords() {
 	let conn; // We need to create this variable here because variables are block scoped.

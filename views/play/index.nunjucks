@@ -1,18 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="/public/index.js"></script>
-	<title>Hangman</title>
-</head>
-<body>
-	<nav>
-		<a href="/">Home</a>
-		<a href="/play">Play</a>
-		<a href="/add">Add Words</a>
-	</nav>
-	<header><h1>Play!</h1></header>
-</body>
-</html>
+{% extends "base.nunjucks" %}
+
+{% block styles %}
+	<link rel="stylesheet" href="play.css">
+{% endblock styles %}
+
+{% block body %}
+	<main class="container">
+		<div id="hangman">
+			<div id="hm-head">Head</div>
+			<div id="hm-torso">Torso</div>
+			<div id="hm-larm">Left Arm</div>
+			<div id="hm-rarm">Right Arm</div>
+			<div id="hm-lleg">Left Leg</div>
+			<div id="hm-rleg">Right Leg</div>
+		</div>
+		<div id="word-guess">
+			<div id="leter-1">_</div>
+			<div id="leter-2">_</div>
+			<div id="leter-3">_</div>
+			<div id="leter-4">_</div>
+		</div>
+	</main>
+{% endblock body %}
+
+{% block scripts %}
+	<script src="play.js"></script>
+{% endblock scripts %}
