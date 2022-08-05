@@ -6,19 +6,23 @@
 
 {% block body %}
 	<main class="container">
+		<h1 id="play_game-state">Starting...</h1>
 		<div id="hangman">
 			<div id="hm-head">Head</div>
-			<div id="hm-torso">Torso</div>
-			<div id="hm-larm">Left Arm</div>
-			<div id="hm-rarm">Right Arm</div>
-			<div id="hm-lleg">Left Leg</div>
-			<div id="hm-rleg">Right Leg</div>
+			<div id="hm-arms" class="hm-vcenter">
+				<div id="hm-larm">Left Arm</div>
+				<div id="hm-torso">Torso</div>
+				<div id="hm-rarm">Right Arm</div>
+			</div>
+			<div id="hm-legs" class="hm-vcenter">
+				<div id="hm-lleg">Left Leg</div>
+				<div id="hm-rleg">Right Leg</div>
+			</div>
 		</div>
-		<div id="word-guess">
-			<div id="leter-1">_</div>
-			<div id="leter-2">_</div>
-			<div id="leter-3">_</div>
-			<div id="leter-4">_</div>
+		<div id="word-guess"></div>
+		<div id="play_guess-letter">
+			<input disable pattern="[A-Za-z]{1}" type="text" id="play_guess-letter-input">
+			<button disable id="play_guess-letter-button">Guess</button>
 		</div>
 	</main>
 {% endblock body %}

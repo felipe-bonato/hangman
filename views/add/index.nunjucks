@@ -2,15 +2,20 @@
 
 {% block styles %}
 	<link rel="stylesheet" href="home.css">
+	<link rel="stylesheet" href="add_words.css">
 {% endblock styles %}
 
 {% block body %}
 	<h1>Words</h1>
 	<span id="add_word--error"></span>
 	<input type="text" id="add_word--input"></input><button id="add_word--button">Add</button>
-	{% for word in words %}
-		<p>{{ word }}</p>
-	{% endfor %}
+	<div class="words-con">
+		{% for word in words %}
+			<div class="word">
+				<span>{{ word }}</span>	
+			</div>
+		{% endfor %}
+	</div>
 {% endblock body %}
 
 {% block scripts %}

@@ -30,6 +30,15 @@ playWith.button.addEventListener('click', evt => {
 	}));
 });
 
+/**
+ * Refresh list
+ */
+document.getElementById('home--online-players_refresh').addEventListener('click', evt => {
+	ws.send(JSON.stringify({
+		'type': 'get_active_players',
+	}));
+});
+
 ws.onmessage = msg => {
 	data = JSON.parse(msg.data);
 	switch (data.type) {
@@ -37,8 +46,32 @@ ws.onmessage = msg => {
 			player = new Player(ws, data.id);
 		break;
 		case 'active_users':
-			activeUsers = data.users;
-			console.log('[INFO] Active users: '); console.log(activeUsers);
+			document.getElementById('home--players').innerHTML = ""
+			for (const [key, value] of Object.entries(data.users)) {
+				if(value.status === "IN_HOME_STR" && parseInt(key) !== player.id){
+					document.getElementById('home--players').innerHTML += '<div class="home--player"><button class="home--play_with">' + key + '</button></div>'
+				}
+			}
+			// Add listener for the buttons
+			for(const player_online of document.getElementsByClassName('home--play_with')){
+				player_online.addEventListener('click', () => {
+					ws.send(JSON.stringify({
+						'type': 'play_with',
+						'player1': player.id,
+						'player2': parseInt(player_online.innerText),
+					}));
+				});
+			};
+		
+		break;
+		case 'play':
+			window.location.replace(
+				window.location + 'play?'
+				+ 'game=' + data.game.id
+				+ '&player1=' + data.game.player1
+				+ '&player2=' + data.game.player2
+				+ '&wordlen=' + data.game.word_len
+			)
 		break;
 		case 'error':
 			let errors = []
@@ -66,6 +99,7 @@ ws.onmessage = msg => {
 				errorsElement.appendChild(errorElement);
 			}
 		break;
+
 		default:
 			console.log('[ERROR] Could not parse message!');
 		break;

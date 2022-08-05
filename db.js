@@ -1,10 +1,9 @@
 //mongod --dbpath=\data
-const MongoClient = require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient
 const fs = require('fs');
-
 const dbConfig = JSON.parse(fs.readFileSync('/home/felipebonato/repos/hangman/config/db.json'));
 
-exports.getAllWords = async function getAllWords() {
+exports.fetchAllWords = async function fetchAllWords() {
 	let conn; // We need to create this variable here because variables are block scoped.
 	try {
 		conn = await MongoClient.connect(dbConfig.url);
@@ -14,16 +13,16 @@ exports.getAllWords = async function getAllWords() {
 	} catch(e) {
 		throw new Error('Could not get word from database\n' + e.toString());
 	} finally {
-		conn.close();
+		//conn.close();
 	}
 }
 
-exports.getRandomWord = async function getRandomWord() {
+exports.fetchRandomWord = async function fetchRandomWord() {
 	let conn; // We need to create this variable here because variables are block scoped.
 	try {
 		conn = await MongoClient.connect(dbConfig.url);
 		const entries = await conn.db(dbConfig.name).collection('words').find({}).toArray();
-		const words = entries.map((entry) => entry.word);
+		const words = entries.map(entry => entry.word);
 		return words[Math.floor(Math.random() * words.length)];
 	} catch(e) {
 		throw new Error('Could not get word from database\n' + e.toString());
@@ -39,28 +38,14 @@ exports.insertWord = async function insertWord(word) {
 		conn = await MongoClient.connect(dbConfig.url);
 		
 		// Checks if already in db
-		const stored_words = await this.getAllWords();
+		const stored_words = await this.fetchAllWords();
 		if(stored_words.includes(word)) {
 			throw new Error('Word already exists');
 		}
 
-		conn.db(dbName).collection('words').insertOne({'word': word});
-	} catch(e) {
-		throw new Error('Could not get word from database\n' + e.toString());
+		await conn.db(dbConfig.name).collection('words').insertOne({'word': word});
 	} finally {
 		conn.close();
-	}
-}
-
-async function deleteAllWords() {
-	const client = new MongoClient(url);
-	try {
-		const conn = await client.connect();
-		conn.db(dbName).collection('words').deleteMany({});
-	} catch {
-		throw new Error('Could not get words from database');
-	} finally {
-		client.close();
 	}
 }
 

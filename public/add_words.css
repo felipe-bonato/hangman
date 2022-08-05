@@ -1,4 +1,3 @@
-.add_word--error {
-	display: none;
+#add_word--error {
 	color: red;
 }

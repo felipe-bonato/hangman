@@ -13,13 +13,37 @@ EAddWordButton.addEventListener('click', evt => {
 		}));
 	} else {
 		const EAddWordError = document.getElementById('add_word--error');
-		EAddWordError.style.display = 'inline';
 		EAddWordError.innerText = 'Invalid Word'
 	}
 
 });
 
 
+ws.onmessage = msg => {
+	data = JSON.parse(msg.data);
+	console.log(data)
+	switch (data.type) {
+		case "get_all_words":
+			let eWords = document.getElementsByClassName('words-con')[0];
+			eWords.innerHTML = ''
+			data.words.forEach(word => {
+				eWords.innerHTML += '<div class="word"><span>' + word + '</span></div>'
+			});
+		break;
+		case "error":
+			switch (data.subtype) {
+				case "word_already_exists":
+					document.getElementById('add_word--error').innerText = 'Word already exists';
+				break;
+				default:
+					document.getElementById('add_word--error').innerText = 'An error occured';
+				break;
+			}
+			
 
-
+		break;
+		default:
+			break;
+	}
+}
 

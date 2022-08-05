@@ -16,10 +16,15 @@
 {% endblock flashErrors %}
 
 {% block body %}
-	<h1>Jogo da forca!</h1>
-	{% for nome in nomes %}
-		<p>Olá {{ nome }}</p>
-	{% endfor %}
+	<h1>Hangman!</h1>
+	<div id="home--online-players">
+		<div style="display: flex; align-items: baseline; gap: 16px;">
+			<h3>Online Players</h3>
+			<button style="height: 100%" id="home--online-players_refresh">🗘</button>
+		</div>
+		<ul id="home--players"></ul> <!-- Players are added in js -->
+	</div>
+	
 	<input type="number" id="play_with--input"></input><button id="play_with--button">Send</button>
 {% endblock body %}
 

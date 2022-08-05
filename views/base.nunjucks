@@ -6,7 +6,7 @@
 	{% block styles %}{% endblock styles %}
 </head>
 <body>
-	<nav>
+	<nav style="margin: 0 auto;">
 		<a href="/">Home</a>
 		<a href="/play">Play</a>
 		<a href="/add">Add Words</a>
